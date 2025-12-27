@@ -45,18 +45,37 @@ def create_app(config_class='app.config.ProductionConfig'):
 
     @app.after_request
     def after_request_logging(response):
+        log_level, message = define_log_event(response.status)
         g.time_taken_ms = round((time.perf_counter() - g.start_time) * 1000, 2)
         response.headers["X-Transaction-Id"] = g.txn_id
-        g.logger.info(
-            "request_completed",
+        getattr(g.logger, log_level)(
+            message,
             extra={
                 "event": "request_completed",
                 "method": request.method,
-                "extra_info": {"response_headers": dict(response.headers)}
+                "extra_info": {
+                    "response_headers": dict(response.headers),
+                    "status_code": response.status_code
+                }
             }
         )
         return response
 
+    def define_log_event(status):
+        if 100 <= status < 300:
+            log_level = "info"
+            message = "request_completed_success"
+        elif 300 <= status < 400:
+            log_level = "warning"
+            message = "request_redirected"
+        elif 400 <= status < 500:
+            log_level = "error"
+            message = "client_error"
+        else:
+            log_level = "critical"
+            message = "server_error"
+        return log_level, message
+    
     from .routes import main_bp
     app.register_blueprint(main_bp)
 
