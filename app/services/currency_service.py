@@ -4,7 +4,7 @@ from flask import current_app
 def get_exchange_rate(base_currency, target_currency):
     api_key = current_app.config['CURRENCY_EXCHANGE_API_KEY']
     url = f"https://v6.exchangerate-api.com/v6/{api_key}/pair/{base_currency}/{target_currency}"
-    current_app.logger.info(f"Running URL {url}", exc_info={'url': url})
+    current_app.logger.info(f"Making call to exchangerate API")
     try:
         response = requests.get(url)
         data = response.json()

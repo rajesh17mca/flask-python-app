@@ -8,11 +8,11 @@ class JsonFormatter(logging.Formatter):
     """Custom formatter to output logs in JSON format."""
     def format(self, record):
         log_record = {
-            "timestamp": self.formatTime(record, self.datefmt),
+            "timestamp": datetime.utcnow().isoformat(),
             "name": record.name,
             "level": record.levelname,
             "event": getattr(record, "event", None),
-            "txn_id": getattr(record, "txn_id", "N/A"),
+            "txn_id": getattr(record, "txn_id", None),
             "uri": getattr(record, "uri", None),
             "time_taken_ms": getattr(record, "time_taken_ms", None),
             "message": record.getMessage(),
@@ -20,33 +20,34 @@ class JsonFormatter(logging.Formatter):
             "func": record.funcName
         }
 
-        if hasattr(record, 'extra_info'):
-            log_record['extra'] = record.extra_info
-            
+        # Include extra_info if present
+        if hasattr(record, "extra_info") and record.extra_info:
+            log_record["extra"] = record.extra_info
+
+        # Remove None values
+        log_record = {k: v for k, v in log_record.items() if v is not None}
         return json.dumps(log_record)
 
 def setup_logger(logger_name='python_flask_app', log_file='app.log', console_level=logging.INFO, file_level=logging.DEBUG):
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.DEBUG)
-    logger.propagate = False 
+    logger.propagate = False
 
-    json_formatter = JsonFormatter()
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(console_level)
-    console_handler.setFormatter(json_formatter)
+    formatter = JsonFormatter()
 
-    file_handler = logging.handlers.RotatingFileHandler(
-        log_file,
-        maxBytes=10485760, # 10 MB
-        backupCount=5
-    )
-    file_handler.setLevel(file_level)
-    file_handler.setFormatter(json_formatter) # Set JSON here
+    # Console handler
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(console_level)
+    ch.setFormatter(formatter)
+
+    # File handler
+    fh = logging.handlers.RotatingFileHandler(log_file, maxBytes=10*1024*1024, backupCount=5)
+    fh.setLevel(file_level)
+    fh.setFormatter(formatter)
 
     if logger.hasHandlers():
         logger.handlers.clear()
 
-    logger.addHandler(console_handler)
-    logger.addHandler(file_handler)
-
+    logger.addHandler(ch)
+    logger.addHandler(fh)
     return logger

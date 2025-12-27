@@ -13,7 +13,7 @@ def get_api_data():
     return {
         'weather_api': '/api/v1/weather?city=<cityname>',
         'currency_api': '/api/v1/currency?base=<base>&target=<target>',
-        'coordinates_api': '/api/v1/coordinates'
+        'coordinates_api': '/api/v1/coordinates?place=<name_of_place>'
     }
 
 @main_bp.route('/api/v1/weather', methods=['GET'])

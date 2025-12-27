@@ -5,7 +5,7 @@ def fetch_weather(city):
     api_key = current_app.config['WEATHER_API_KEY']
     # params = { 'key': api_key, 'q': city, 'aqi': 'yes' }
     url = f"http://api.weatherapi.com/v1/current.json?key={api_key}&q={city}"
-    current_app.logger.info(f"Running URL {url}", exc_info={'url': url})
+    current_app.logger.info(f"Making a call to weather API")
     try:
         response = requests.get(url, timeout=5)
         if response.status_code == 200:

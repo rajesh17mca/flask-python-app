@@ -3,6 +3,7 @@ from flask import current_app
 
 def search_city_by_name(place):
     url = f"https://geocoding-api.open-meteo.com/v1/search?name={place}&count=1&language=en&format=json"
+    current_app.logger.info(f"Making call to geocoding API", exc_info={'url': url})
     try:
         response = requests.get(url)
         data = response.json()
