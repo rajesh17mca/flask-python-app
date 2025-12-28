@@ -45,7 +45,7 @@ def create_app(config_class='app.config.ProductionConfig'):
 
     @app.after_request
     def after_request_logging(response):
-        log_level, message = define_log_event(response.status)
+        log_level, message = define_log_event(int(response.status_code))
         g.time_taken_ms = round((time.perf_counter() - g.start_time) * 1000, 2)
         response.headers["X-Transaction-Id"] = g.txn_id
         getattr(g.logger, log_level)(
