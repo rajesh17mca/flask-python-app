@@ -44,6 +44,7 @@ http://0.0.0.0:8080/api/v1/list_api
 http://0.0.0.0:8080/api/v1/coordinates?place=nellore
 http://0.0.0.0:8080/api/v1/currency?base=USD&target=INR
 http://0.0.0.0:8080/api/v1/weather?city=nellore
+```
 
 #### Run as container
 ```
