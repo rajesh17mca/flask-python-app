@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv() # Load variables from .env
+load_dotenv()
 
 class Config:
     WEATHER_API_KEY = os.environ.get('WEATHER_API_KEY')
